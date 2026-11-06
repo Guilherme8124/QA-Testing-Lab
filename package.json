@@ -1,0 +1,8 @@
+{
+  "name": "qa-testing-lab",
+  "version": "1.1.0",
+  "description": "Laboratório web para praticar fundamentos de QA.",
+  "scripts": { "test": "node tests/smoke.js", "start": "npx serve ." },
+  "devDependencies": { "playwright": "^1.48.0" },
+  "license": "MIT"
+}

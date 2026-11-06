@@ -1,0 +1,34 @@
+/* Teste de fumaça: npm install && npx playwright install chromium && npm test */
+const { chromium } = require("playwright");
+const assert = require("assert");
+const path = require("path");
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  const errors = [];
+  page.on("pageerror", e => errors.push(e.message));
+  page.on("dialog", d => d.accept());
+  await page.goto("file://" + path.resolve(__dirname, "../index.html"));
+  assert.equal(await page.textContent("#stat-total"), "4", "dashboard deve abrir com os dados demo");
+  await page.click('[data-view="cases"]');
+  assert.equal(await page.locator("#cases-table tr").count(), 4);
+  await page.click('#view-cases [data-action="new-case"]');
+  await page.fill("#title", "Caso automatizado");
+  await page.fill("#steps", "1. Abrir");
+  await page.fill("#expected", "OK");
+  await page.selectOption("#status", "Reprovado");
+  await page.click("#save-modal");
+  assert.equal(await page.locator("#cases-table tr").count(), 5);
+  await page.click("#cases-table tr:first-child [data-newbug]");
+  assert.ok((await page.inputValue("#title")).startsWith("Falha em TC-005"), "bug deve vir pré-preenchido");
+  await page.keyboard.press("Escape");
+  assert.ok(await page.locator("#modal-backdrop.hidden").count(), "Esc deve fechar o modal");
+  await page.reload();
+  assert.equal(await page.textContent("#stat-total"), "5", "dados devem persistir");
+  await page.click('[data-view="cases"]');
+  await page.click("#cases-table tr:first-child [data-delete]");
+  assert.equal(await page.locator("#cases-table tr").count(), 4);
+  assert.deepEqual(errors, [], "não pode haver erros de JavaScript");
+  await browser.close();
+  console.log("OK: todos os testes passaram.");
+})().catch(e => { console.error(e); process.exit(1); });

@@ -1,0 +1,526 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0d0f12">
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E%E2%9C%B3%3C/text%3E%3C/svg%3E">
+
+  <meta name="description" content="QA Testing Lab — laboratório de qualidade de software para organizar casos de teste, bugs e sessões exploratórias.">
+
+  <title>QA Testing Lab</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <aside class="sidebar" id="sidebar">
+
+      <a class="brand" href="#" aria-label="QA Testing Lab início">
+        <span class="brand-mark">✳</span>
+        <span>
+          <strong>QA Testing Lab</strong>
+          <small>QUALITY WORKSPACE</small>
+        </span>
+      </a>
+
+      <div class="workspace-label">WORKSPACE</div>
+
+      <nav class="main-nav" aria-label="Navegação principal">
+        <button class="nav-item active" data-view="dashboard"><span>▦</span> Dashboard</button>
+        <button class="nav-item" data-view="cases"><span>☷</span> Casos de teste <em id="nav-case-count">0</em></button>
+        <button class="nav-item" data-view="bugs"><span>⚑</span> Bugs <em id="nav-bug-count">0</em></button>
+        <button class="nav-item" data-view="exploratory"><span>⌕</span> Testes exploratórios</button>
+        <button class="nav-item" data-view="reports"><span>▤</span> Relatórios</button>
+      </nav>
+
+      <div class="sidebar-bottom">
+
+        <div class="storage-card">
+          <span class="storage-icon">◈</span>
+          <div>
+            <strong>Armazenamento local</strong>
+            <small>Seus dados ficam neste navegador.</small>
+          </div>
+          <span class="online-dot"></span>
+        </div>
+
+        <button class="nav-item" id="export-data"><span>⇩</span> Exportar dados</button>
+        <button class="nav-item" id="import-data"><span>⇧</span> Importar backup</button>
+
+        <input type="file" id="import-file" accept="application/json" hidden>
+
+        <div class="profile">
+          <div class="avatar">QA</div>
+          <div>
+            <strong>QA Workspace</strong>
+            <small>Projeto pessoal</small>
+          </div>
+          <button class="icon-button" id="reset-demo" title="Restaurar dados de demonstração" aria-label="Restaurar dados de demonstração">↻</button>
+        </div>
+
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <header class="topbar">
+
+        <button class="mobile-menu icon-button" id="mobile-menu" aria-label="Abrir menu">☰</button>
+
+        <div class="breadcrumb">
+          <span>Workspace</span>
+          <b>/</b>
+          <strong id="breadcrumb-current">Dashboard</strong>
+        </div>
+
+        <div class="topbar-right">
+          <span class="status-pill"><i></i> Ambiente local</span>
+          <div class="top-avatar">G</div>
+        </div>
+
+      </header>
+
+      <div class="page-wrap">
+
+        <!-- DASHBOARD -->
+
+        <section class="view active" id="view-dashboard">
+
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">VISÃO GERAL</p>
+              <h1>Dashboard</h1>
+              <p class="muted">Acompanhe a qualidade e a execução dos seus testes.</p>
+            </div>
+
+            <button class="btn btn-primary" data-action="new-case">
+              <span>＋</span> Novo caso de teste
+            </button>
+          </div>
+
+          <div class="stats-grid">
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Total de casos</span>
+                <span class="stat-icon purple">☷</span>
+              </div>
+              <strong id="stat-total">0</strong>
+              <small>Casos cadastrados</small>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Aprovados</span>
+                <span class="stat-icon green">✓</span>
+              </div>
+              <strong id="stat-passed">0</strong>
+              <small>Execuções aprovadas</small>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Reprovados</span>
+                <span class="stat-icon red">!</span>
+              </div>
+              <strong id="stat-failed">0</strong>
+              <small>Precisam de atenção</small>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Bugs abertos</span>
+                <span class="stat-icon amber">⚑</span>
+              </div>
+              <strong id="stat-open-bugs">0</strong>
+              <small>Defeitos não resolvidos</small>
+            </article>
+
+          </div>
+
+          <div class="dashboard-grid">
+
+            <article class="panel execution-panel">
+
+              <div class="panel-heading">
+                <div>
+                  <h2>Resumo das execuções</h2>
+                  <p class="muted">Distribuição dos resultados registrados</p>
+                </div>
+                <span class="subtle-tag">GERAL</span>
+              </div>
+
+              <div class="chart-area">
+
+                <div class="donut" id="execution-donut">
+                  <div>
+                    <strong id="donut-total">0</strong>
+                    <small>casos</small>
+                  </div>
+                </div>
+
+                <div class="legend">
+                  <div><i class="legend-dot passed"></i><span>Aprovados</span><strong id="legend-passed">0</strong></div>
+                  <div><i class="legend-dot failed"></i><span>Reprovados</span><strong id="legend-failed">0</strong></div>
+                  <div><i class="legend-dot blocked"></i><span>Bloqueados</span><strong id="legend-blocked">0</strong></div>
+                  <div><i class="legend-dot notrun"></i><span>Não executados</span><strong id="legend-notrun">0</strong></div>
+                </div>
+
+              </div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-heading">
+                <div>
+                  <h2>Bugs abertos por severidade</h2>
+                  <p class="muted">Defeitos ainda não resolvidos</p>
+                </div>
+              </div>
+
+              <div class="priority-list" id="priority-summary"></div>
+            </article>
+
+          </div>
+
+          <article class="panel recent-panel">
+
+            <div class="panel-heading">
+              <div>
+                <h2>Atividade recente</h2>
+                <p class="muted">Últimos casos de teste atualizados</p>
+              </div>
+
+              <button class="text-button" data-navigate="cases">Ver todos →</button>
+            </div>
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Caso de teste</th>
+                    <th>Categoria</th>
+                    <th>Último resultado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="recent-cases"></tbody>
+              </table>
+            </div>
+
+          </article>
+
+        </section>
+
+        <!-- CASOS DE TESTE -->
+
+        <section class="view" id="view-cases">
+
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">QUALIDADE</p>
+              <h1>Casos de teste</h1>
+              <p class="muted">Planeje, execute e acompanhe cenários de teste.</p>
+            </div>
+
+            <button class="btn btn-primary" data-action="new-case">＋ Novo caso de teste</button>
+          </div>
+
+          <div class="toolbar">
+
+            <div class="search-box">
+              <span>⌕</span>
+              <input id="case-search" type="search" aria-label="Buscar casos de teste" placeholder="Buscar por ID, título ou funcionalidade...">
+            </div>
+
+            <select id="case-filter" aria-label="Filtrar casos">
+              <option value="all">Todos os status</option>
+              <option value="Não executado">Não executado</option>
+              <option value="Aprovado">Aprovado</option>
+              <option value="Reprovado">Reprovado</option>
+              <option value="Bloqueado">Bloqueado</option>
+            </select>
+
+          </div>
+
+          <article class="panel table-panel">
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nome do teste</th>
+                    <th>Categoria</th>
+                    <th>Prioridade</th>
+                    <th>Status</th>
+                    <th>Execuções</th>
+                    <th>Atualizado</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="cases-table"></tbody>
+              </table>
+            </div>
+
+            <div class="empty-state hidden" id="cases-empty">
+              <span>☷</span>
+              <strong>Nenhum caso encontrado</strong>
+              <p>Crie um caso de teste ou ajuste os filtros.</p>
+            </div>
+
+          </article>
+
+        </section>
+
+        <!-- BUGS -->
+
+        <section class="view" id="view-bugs">
+
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">DEFEITOS</p>
+              <h1>Rastreamento de bugs</h1>
+              <p class="muted">Registre defeitos com passos claros para reprodução.</p>
+            </div>
+
+            <button class="btn btn-primary" data-action="new-bug">＋ Registrar bug</button>
+          </div>
+
+          <div class="toolbar">
+
+            <div class="search-box">
+              <span>⌕</span>
+              <input id="bug-search" type="search" aria-label="Buscar bugs" placeholder="Buscar por ID, título ou descrição...">
+            </div>
+
+            <select id="bug-filter" aria-label="Filtrar bugs por status">
+              <option value="all">Todos os status</option>
+              <option value="Aberto">Aberto</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Resolvido">Resolvido</option>
+              <option value="Fechado">Fechado</option>
+              <option value="Duplicado">Duplicado</option>
+              <option value="Não reproduzível">Não reproduzível</option>
+            </select>
+
+          </div>
+
+          <article class="panel table-panel">
+
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Defeito</th>
+                    <th>Severidade</th>
+                    <th>Prioridade</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="bugs-table"></tbody>
+              </table>
+            </div>
+
+            <div class="empty-state hidden" id="bugs-empty">
+              <span>⚑</span>
+              <strong>Nenhum bug encontrado</strong>
+              <p>Registre um defeito para começar.</p>
+            </div>
+
+          </article>
+
+        </section>
+
+        <!-- TESTES EXPLORATÓRIOS -->
+
+        <section class="view" id="view-exploratory">
+
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">DESCOBERTA</p>
+              <h1>Testes exploratórios</h1>
+              <p class="muted">Registre sessões, objetivos, observações e descobertas.</p>
+            </div>
+
+            <button class="btn btn-primary" data-action="new-session">＋ Nova sessão</button>
+          </div>
+
+          <div class="info-banner">
+            <span>✦</span>
+            <p>
+              <strong>Dica de QA:</strong>
+              em um teste exploratório, você aprende sobre o produto enquanto testa.
+              Registre o que tentou, o que observou e quais dúvidas surgiram.
+            </p>
+          </div>
+
+          <div class="session-grid" id="sessions-list"></div>
+
+          <div class="empty-state hidden panel" id="sessions-empty">
+            <span>⌕</span>
+            <strong>Nenhuma sessão registrada</strong>
+            <p>Crie uma sessão para documentar sua exploração.</p>
+          </div>
+
+        </section>
+
+        <!-- RELATÓRIOS -->
+
+        <section class="view" id="view-reports">
+
+          <div class="page-heading">
+            <div>
+              <p class="eyebrow">ACOMPANHAMENTO</p>
+              <h1>Relatórios</h1>
+              <p class="muted">Consolide os resultados e exporte um resumo do laboratório.</p>
+            </div>
+
+            <button class="btn btn-primary" id="download-report">⇩ Exportar relatório CSV</button>
+          </div>
+
+          <div class="stats-grid report-stats">
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Taxa de aprovação</span>
+                <span class="stat-icon green">✓</span>
+              </div>
+              <strong id="report-pass-rate">0%</strong>
+              <small>Sobre execuções concluídas</small>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Total de bugs</span>
+                <span class="stat-icon amber">⚑</span>
+              </div>
+              <strong id="report-bugs">0</strong>
+              <small>Todos os registros</small>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Sessões exploratórias</span>
+                <span class="stat-icon purple">⌕</span>
+              </div>
+              <strong id="report-sessions">0</strong>
+              <small>Sessões documentadas</small>
+            </article>
+
+            <article class="stat-card">
+              <div class="stat-top">
+                <span>Casos bloqueados</span>
+                <span class="stat-icon red">Ⅱ</span>
+              </div>
+              <strong id="report-blocked">0</strong>
+              <small>Execuções impedidas</small>
+            </article>
+
+          </div>
+
+          <article class="panel report-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Resumo do projeto</h2>
+                <p class="muted">Indicadores calculados com os dados atuais</p>
+              </div>
+            </div>
+
+            <div id="report-summary" class="report-summary"></div>
+          </article>
+
+          <article class="panel report-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Como interpretar</h2>
+              </div>
+            </div>
+
+            <p class="muted">
+              A taxa de aprovação considera apenas casos aprovados ou reprovados.
+              Casos não executados e bloqueados não entram no denominador.
+              Um bug registrado não significa necessariamente que ele foi confirmado
+              por outra pessoa: mantenha evidências e passos de reprodução objetivos.
+            </p>
+          </article>
+
+        </section>
+
+      </div>
+
+      <footer class="footer">
+        <span>QA Testing Lab <span class="gold">✳</span></span>
+        <span>Feito para praticar qualidade de software · v1.1</span>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL -->
+
+  <div class="modal-backdrop hidden" id="modal-backdrop">
+
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">QA TESTING LAB</p>
+          <h2 id="modal-title">Novo registro</h2>
+        </div>
+
+        <button class="icon-button" id="close-modal" aria-label="Fechar">✕</button>
+      </div>
+
+      <form id="modal-form">
+
+        <div id="modal-fields" class="modal-fields"></div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cancel-modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="save-modal">Salvar registro</button>
+        </div>
+
+      </form>
+
+    </section>
+
+  </div>
+
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+  <!-- SUPABASE -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase.js"></script>
+
+  <!-- APLICAÇÃO -->
+
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/test-cases.js"></script>
+  <script src="js/bugs.js"></script>
+  <script src="js/exploratory.js"></script>
+  <script src="js/reports.js"></script>
+
+  <script>
+    window.QA.refresh();
+  </script>
+
+</body>
+</html>
